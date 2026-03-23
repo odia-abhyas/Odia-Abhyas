@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile | Odia Abhyas</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f4f6f8}
+
+/* Loader */
+.loader-screen{
+  position:fixed; inset:0; background:#fff;
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center; z-index:10;
+}
+.loader{
+  width:60px;height:60px;
+  border:6px solid #ddd;
+  border-top:6px solid #2c5364;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Logo */
+.logo{text-align:center;margin:25px 0}
+.logo img{max-width:180px;width:60%}
+
+/* Card */
+.card{
+  width:90%;max-width:420px;margin:0 auto 30px;
+  background:#fff;padding:20px;border-radius:16px;
+  box-shadow:0 15px 30px rgba(0,0,0,.15);
+  display:none;
+}
+h2{text-align:center;margin-bottom:20px}
+
+.field{margin-bottom:14px}
+.field label{font-size:13px;color:#555}
+.field input{
+  width:100%;padding:12px;border-radius:10px;
+  border:1px solid #ccc;margin-top:6px;
+}
+.field input[disabled]{background:#eee}
+
+.edit-btn{
+  width:100%;padding:12px;border:none;
+  border-radius:12px;background:#2c5364;
+  color:#fff;font-size:16px;margin-top:10px;
+}
+
+/* Status */
+.status{
+  margin-top:20px;padding:14px;
+  border-radius:12px;background:#f1f3f5;
+  font-size:14px;
+}
+
+/* Popup */
+.popup{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.6);
+  display:none; justify-content:center; align-items:center; z-index:20;
+}
+.popup-box{
+  background:#fff;padding:20px;
+  border-radius:14px;width:80%;
+  max-width:300px;text-align:center;
+}
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div class="loader-screen" id="loaderScreen">
+  <div class="loader"></div>
+  <p style="margin-top:12px;">Checking user info…</p>
+</div>
+
+<!-- Logo -->
+<div class="logo">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEikyplYHsAVRU7bNPQC_BC5DIiwBe49NMKBYdK3lD0mEpskqQ8-GoSoUcipT9QJdj3QZAh4oyycUYtQN81DI-3f-0w3gvh0OJdYQNGHlkUN9tw7nupYdSFkyHG7nop37HZ5-HLZwugtnrgzMvtj8J9hedqPHPJWqNvRChvFHzLvytYeWalvuCDjdjyXu_LQ/s1600/Gemini_Generated_Image_8c2dct8c2dct8c2d-removebg-preview.png">
+</div>
+
+<!-- Profile Card -->
+<div class="card" id="profileCard">
+  <h2>My Profile</h2>
+
+  <div class="field">
+    <label>User Name</label>
+    <input id="name" disabled>
+  </div>
+
+  <div class="field">
+    <label>Phone Number</label>
+    <input id="phone" disabled>
+  </div>
+
+  <div class="field">
+    <label>Email</label>
+    <input id="email" disabled>
+  </div>
+
+  <div class="field" style="position:relative;">
+    <label>Password</label>
+    <input id="password" type="password" disabled style="padding-right:45px;">
+    <span id="eyeIcon" onclick="togglePassword()"
+      style="position:absolute;right:14px;top:38px;
+      cursor:pointer;font-size:18px;color:#555;pointer-events:none;">👁️</span>
+  </div>
+
+  <button class="edit-btn" id="saveBtn" onclick="toggleEdit()">Update Profile</button>
+
+  <div class="status" id="statusBox"></div>
+</div>
+
+
+  <div style="
+  display:flex;
+  gap:12px;
+  margin:15px 0;
+">
+
+
+
+
+
+</div>
+
+<!-- Popup -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <p id="popupText"></p>
+  </div>
+</div>
+
+<script>
+/* Firebase Init */
+firebase.initializeApp({
+  apiKey: "AIzaSyAm8LD9iSm24vG2rc_bBSjXuATXxs7-lbE",
+  authDomain: "odia-abhyas.firebaseapp.com",
+  projectId: "odia-abhyas"
+});
+const db = firebase.firestore();
+
+/* Popup */
+function showPopup(msg){
+  document.getElementById("popupText").innerText = msg;
+  document.getElementById("popup").style.display="flex";
+}
+function closePopup(){
+  document.getElementById("popup").style.display="none";
+}
+
+/* Expiry check */
+function isExpired(dateStr){
+  if(!dateStr) return true;
+  return new Date(dateStr) < new Date();
+}
+
+/* Load profile */
+window.onload = ()=>{
+  const phone = localStorage.getItem("user_phone");
+  const pass  = localStorage.getItem("user_password");
+
+  if(!phone || !pass){
+    location.href="login.html";
+    return;
+  }
+
+  db.collection("users").doc(phone).get().then(doc=>{
+    if(!doc.exists || doc.data().password !== pass){
+      localStorage.clear();
+      location.href="login.html";
+      return;
+    }
+
+    const d = doc.data();
+    name.value = d.name;
+    phoneInput.value = d.phone;
+    email.value = d.email;
+    password.value = d.password;
+
+    let paidText="Not Active", expText="None";
+    if(d.paid==="yes" && !isExpired(d.duration)){
+      paidText="Active";
+      expText=d.duration;
+    }
+
+    statusBox.innerHTML = `
+      <b>Paid Course:</b> ${paidText}<br>
+      <b>Expire Date:</b> ${expText}
+    `;
+
+    loaderScreen.style.display="none";
+    profileCard.style.display="block";
+  });
+};
+
+/* Edit / Save logic */
+let editing=false;
+const name=document.getElementById("name");
+const password=document.getElementById("password");
+const phoneInput=document.getElementById("phone");
+const email=document.getElementById("email");
+const statusBox=document.getElementById("statusBox");
+
+function toggleEdit(){
+  const btn=document.getElementById("saveBtn");
+  const eye=document.getElementById("eyeIcon");
+
+  if(!editing){
+    name.disabled=false;
+    password.disabled=false;
+    eye.style.pointerEvents="auto";
+    btn.innerText="Save Changes";
+    editing=true;
+  }else{
+    saveProfile();
+  }
+}
+
+/* Save profile */
+function saveProfile(){
+  showPopup("Saving…");
+
+  const phone=localStorage.getItem("user_phone");
+
+  db.collection("users").doc(phone).update({
+    name:name.value.trim(),
+    password:password.value.trim()
+  }).then(()=>{
+    localStorage.setItem("user_name",name.value.trim());
+    localStorage.setItem("user_password",password.value.trim());
+
+    name.disabled=true;
+    password.disabled=true;
+    document.getElementById("eyeIcon").style.pointerEvents="none";
+    document.getElementById("saveBtn").innerText="Update Profile";
+    editing=false;
+
+    showPopup("✅ Saved Successfully");
+    setTimeout(closePopup,1200);
+  });
+}
+
+/* Password toggle */
+function togglePassword(){
+  password.type = password.type==="password" ? "text" : "password";
+}
+</script>
+</body>
+</html>

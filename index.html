@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up / Login</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{
+  margin:0;
+  height:100vh;
+  background:#ffffff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+/* Loader */
+.loader-box{
+  display:none;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.loader{
+  width:70px;
+  height:70px;
+  border:7px solid #ddd;
+  border-top:7px solid #2c5364;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Card */
+.card{
+  width:90%;
+  max-width:360px;
+  background:#F0E9E9;
+  padding:22px;
+  border-radius:16px;
+  box-shadow:0 25px 40px rgba(0,0,0,.4);
+  display:none;
+}
+h2{text-align:center;margin-bottom:18px;}
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:14px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#2c5364;
+  color:#fff;
+  font-size:16px;
+  margin-bottom:10px;
+}
+.toggleBtn{
+  width:100%;
+  background:#ccc;color:#000;font-size:14px;
+}
+/* Popup */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+.popup-box{
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  width:80%;
+  text-align:center;
+}
+</style>
+</head>
+<body>
+
+    <div style="
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+">
+
+<!-- Loader -->
+<div class="loader-box" id="loaderBox">
+  <div class="loader"></div>
+</div>
+
+<!-- Centered Transparent Logo -->
+<div style="
+  width:100%;
+  text-align:center;
+  margin:25px 0;
+  display:block;
+  clear:both;
+">
+  <img 
+    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEikyplYHsAVRU7bNPQC_BC5DIiwBe49NMKBYdK3lD0mEpskqQ8-GoSoUcipT9QJdj3QZAh4oyycUYtQN81DI-3f-0w3gvh0OJdYQNGHlkUN9tw7nupYdSFkyHG7nop37HZ5-HLZwugtnrgzMvtj8J9hedqPHPJWqNvRChvFHzLvytYeWalvuCDjdjyXu_LQ/s1600/Gemini_Generated_Image_8c2dct8c2dct8c2d-removebg-preview.png"
+    alt="Odia Abhyas Logo"
+    style="
+      max-width:180px;
+      width:60%;
+      height:auto;
+      display:block;
+      margin:0 auto;
+    ">
+</div>     
+
+<!-- Signup/Login Card -->
+<div class="card" id="authCard">
+  <h2 id="formTitle" >Connect With Odia Abhyas</h2>
+  <input id="phone" placeholder="Phone Number" maxlength="10">
+  <input id="name" placeholder="Full Name">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button id="submitBtn" onclick="submitUser()">Submit</button>
+  <button class="toggleBtn" id="toggleBtn" onclick="toggleForm()">Already have an account? Login</button>
+</div>
+
+      <br>
+<center>
+      <h5 style="
+  text-align:center;
+  margin-top:10px;
+  color:#2c5364;
+  cursor:pointer;
+  font-weight:500;
+  text-decoration:underline;
+"
+onclick="window.location.href='forgotpassword.html';">
+  Forget Password?
+</h5></center>
+
+<!-- Popup -->
+<!-- Popup -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <p id="popupText"></p>
+    <button onclick="closePopup()" style="
+      margin-top:12px;
+      padding:10px 20px;
+      border:none;
+      border-radius:10px;
+      background:#2c5364;
+      color:#fff;
+      font-size:15px;
+    ">Close</button>
+  </div>
+</div>
+</div>
+<script>
+/* Firebase Init */
+firebase.initializeApp({
+  apiKey: "AIzaSyAm8LD9iSm24vG2rc_bBSjXuATXxs7-lbE",
+  authDomain: "odia-abhyas.firebaseapp.com",
+  projectId: "odia-abhyas"
+});
+const db = firebase.firestore();
+
+/* Helpers */
+const validEmail = e => e.includes("@");
+const validPassword = p => /(?=.*[0-9])(?=.*[!@#$%^&*])/.test(p);
+
+/* Popup */
+function showPopup(msg){
+  document.getElementById("popupText").innerText = msg;
+  document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display = "none";
+}    
+
+/* Show Loader */
+function showLoader(){
+  document.getElementById("authCard").style.display="none";
+  document.getElementById("loaderBox").style.display="flex";
+}
+
+/* Show Form */
+function showForm(){
+  document.getElementById("loaderBox").style.display="none";
+  document.getElementById("authCard").style.display="block";
+}
+
+/* Redirect */
+function redirect(){
+  window.location.href="home.html";
+}
+
+/* Toggle Form SignUp/Login */
+let isLogin=false;
+function toggleForm(){
+  isLogin = !isLogin;
+  document.getElementById("formTitle").innerText = isLogin ? "Login" : "Sign Up";
+  document.getElementById("submitBtn").innerText = isLogin ? "Login" : "Submit";
+  document.getElementById("toggleBtn").innerText = isLogin ? "New user? Sign Up" : "Already have an account? Login";
+
+  // Show/hide extra fields
+  document.getElementById("name").style.display = isLogin ? "none" : "block";
+  document.getElementById("email").style.display = isLogin ? "none" : "block";
+}
+
+/* Submit Form */
+function submitUser(){
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+
+  if(!/^\d+$/.test(phone)) return showPopup("Phone must contain only numbers");
+  if(password.length<4) return showPopup("Password required");
+
+  if(!isLogin){
+    if(!validEmail(email)) return showPopup("Invalid Email");
+    if(!validPassword(password)) return showPopup("Password must contain number & symbol");
+
+    // Sign Up
+    db.collection("users").doc(phone).set({
+      phone: phone,
+      name: name,
+      email: email,
+      password: password,
+      paid: "no",
+      duration: null
+    }).then(()=>{
+      localStorage.setItem("user_phone", phone);
+      localStorage.setItem("user_name", name);
+      localStorage.setItem("user_email", email);
+      localStorage.setItem("user_password", password);
+
+      showPopup("✅ Registration Successful");
+      setTimeout(()=>{
+        document.getElementById("popup").style.display="none";
+        showLoader();
+        setTimeout(redirect,1200);
+      },1000);
+    }).catch(err=>{
+      showPopup("Firebase Error: "+err.message);
+    });
+  } else {
+    // Login
+    db.collection("users").doc(phone).get().then(doc=>{
+      if(!doc.exists) return showPopup("Phone number not found");
+      if(doc.data().password !== password) return showPopup("Incorrect password");
+
+      // Save back to localStorage
+      localStorage.setItem("user_phone", doc.data().phone);
+      localStorage.setItem("user_name", doc.data().name);
+      localStorage.setItem("user_email", doc.data().email);
+      localStorage.setItem("user_password", doc.data().password);
+
+      showPopup("✅ Login Successful");
+      setTimeout(()=>{
+        document.getElementById("popup").style.display="none";
+        showLoader();
+        setTimeout(redirect,1200);
+      },1000);
+    }).catch(err=>showPopup("Firebase Error: "+err.message));
+  }
+}
+
+/* On Page Load */
+window.onload = ()=>{
+  const phone = localStorage.getItem("user_phone");
+  const pass  = localStorage.getItem("user_password");
+
+  if(!phone || !pass){
+    showForm();
+    return;
+  }
+
+  // Silent check
+  showLoader();
+  db.collection("users").doc(phone).get()
+    .then(doc=>{
+      if(doc.exists && doc.data().password === pass){
+        redirect();
+      } else {
+        showForm();
+      }
+    }).catch(showForm);
+};
+</script>
+
+</body>
+</html>

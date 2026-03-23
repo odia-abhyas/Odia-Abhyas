@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odia Abhyas</title>
+
+<style>
+
+  {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8}
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;background:#f4f6f8;color:#fff;
+  position:sticky;top:0;z-index:10
+}
+header span{font-weight:bold}
+
+.tabs{display:flex;background:#1976D2;border-radius:20px; width:80%; align-items:center}
+.tab-btn{flex:1;padding:10px;color:#fff;text-align:center;cursor:pointer}
+.tab-btn.active{background:#0D47A1;font-weight:bold;border-radius:20px}
+
+.tab-content{display:none;padding:10px}
+.tab-content.active{display:block}
+
+.cards{display:flex;flex-wrap:wrap;gap:10px}
+.card{
+  flex:1 1 45%;background:#fff;border-radius:10px;
+  padding:15px;text-align:center;cursor:pointer;
+  box-shadow:0 2px 5px rgba(0,0,0,.2);
+  position:relative
+}
+.card.locked::after{
+  content:"🔒";position:absolute;top:8px;right:8px;font-size:18px
+}
+
+.popup-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center;z-index:20
+}
+.popup{
+  background:#fff;padding:20px;border-radius:10px;
+  width:85%;max-width:300px;text-align:center
+}
+.popup button{
+  margin-top:15px;padding:10px 15px;border:none;
+  background:#2196F3;color:#fff;border-radius:6px
+}
+
+.loader{
+  position:fixed;inset:0;background:#fff;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;z-index:50
+}
+.spin{
+  width:45px;height:45px;border:5px solid #ddd;
+  border-top:5px solid #2196F3;border-radius:50%;
+  animation:spin 1s linear infinite;margin-bottom:10px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:480px){
+  .card{flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+
+<header style="
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 15px;
+">
+
+  <!-- User icon + username (clickable) -->
+  <div 
+    onclick="window.location.href='profile.html'"
+    style="
+      display:flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+    ">
+    
+    <img 
+      src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhsp-v0JLzLapWnqP6ZCMt9c29sWGHwQvvqXMpf4k6BnMPQlhudzBU-X6cRVZ7iKf8uBaMJNKqxyJelpgVHjrnN3NCJTAxUfD-gCW6__yC7-bvwb1WBneNJx77WTSEwCciJ9eU7ZTGjQqeouNnpMrTD6eKW_yDoKC0NrnK6CJ4QJ9CC90KwkI9w4viCDwVV/s1600/icons8-user-location-48.png"
+      alt="User"
+      style="width:22px;height:22px;"
+    >
+
+    <span id="username" style="font-size:14px; color:black;">
+      User
+    </span>
+  </div>
+
+  <!-- App Name -->
+  <div style="font-weight:bold; font-size:16px; color:black;">
+    Odia Abhyas
+  </div>
+
+</header>
+  <center>
+<div style="height:5px;"></div>
+<div class="tabs">
+ <div style="display:none;"> <div class="tab-btn " data-tab="free">Free</div></div>
+  <div class="tab-btn active" data-tab="mock">Mocktests</div>
+ <div style="display:none;">  <div class="tab-btn" data-tab="topic">Topic Wise</div></div>
+</div></center>
+<div style="display:none;">
+<div id="free" class="tab-content ">
+
+
+  
+<a href="https://edumocker-free-tests.blogspot.com/" 
+   style="text-decoration:none; display:block; max-width:420px; margin:14px auto;">
+  <div style="
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:18px 16px;
+    background:#ffffff;
+    border-radius:16px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+    text-align:center;
+  "
+  onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 18px rgba(0,0,0,0.22)';"
+  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';"
+  >
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj5nP2swRHGTBkubCJOQaijw8RjXVV27u9phcSmgqcRVA8xl0h28Aq6n9LPQcdfkwN1ON7kyhcNE7QSnENOn9aNkcCXE0uR0zxJJPTreQNjV-Q9TqQCZx1O86SrTWlFvov9Rt5hwi62p1-aCCR-JvA8_EjfqppGaJrzjNpO_PI8U35-NV4GBfBIYhwKHdy7/s1600/quiz.png"
+         style="width:64px; height:64px; object-fit:contain; margin-bottom:10px;" />
+    <div style="
+      font-size:18px;
+      font-weight:600;
+      color:#222;
+      font-family:Arial, sans-serif;
+    ">
+      Smart Quizzes
+    </div>
+  </div>
+</a>
+
+  
+<div style="
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin:20px auto;
+  max-width:420px;
+">
+
+  <!-- Notes Card -->
+  <div onclick="location.href='https://important-pages-edumocker.blogspot.com/2026/02/schedule-edumocker-edumocker-daily.html'"
+       style="
+        width:50%;
+        background:#ffffff;
+        border-radius:16px;
+        padding:16px 8px;
+        text-align:center;
+        box-shadow:0 6px 18px rgba(0,0,0,0.12);
+        cursor:pointer;
+       ">
+
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiBDawJ1HFc_ZGua20DQt8zvcFJICsyG8r7Aw-3J-4JIujJ7amLDEDMK1AbnFhewe7Xs11mByA-Szljft3kNA5Qa1rVSaw0ZXh2l2AHrHt4jNoPe90xEwuQ59_VDrYw2AU5SKEutl56yUWL8qNKGyN25moKJbmtL9Iq0LWLJPjj2r6tVshGoD07FE8Yhy4a/s1600/icons8-notes-64.png"
+         style="width:48px; height:48px; margin-bottom:10px;">
+
+    <div style="font-size:15px; font-weight:600; color:#222;">
+      Schedule
+    </div>
+
+  </div>
+
+  <!-- Calculation Speed Card -->
+  <div onclick="location.href='https://officialappaarav-spec.github.io/Calculation-speed/'"
+       style="
+        width:50%;
+        background:#ffffff;
+        border-radius:16px;
+        padding:16px 8px;
+        text-align:center;
+        box-shadow:0 6px 18px rgba(0,0,0,0.12);
+        cursor:pointer;
+       ">
+
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg4B_v289l8N9y7NK5ZZ6LQQqGfRvuqIhbd0Rb2V9t0UXhQhFztgbE4GrDsGY53mG5WLezQBsa0K9jLv8Lyl0Em1KSj3uGX1FzHAvQl2OUWYmdnd-98WEXG2eAtmRDEZsYF8Paa7vQJUIcLo1BSmbKG4-YxlMC2R__UpNymemAnzo-IRB048S1SWLRRedYc/s1600/icons8-rocket-64.png"
+         style="width:48px; height:48px; margin-bottom:10px;">
+
+    <div style="font-size:15px; font-weight:600; color:#222;">
+      Calculation Speed
+    </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin:20px auto;
+  max-width:420px;
+">
+
+  <!-- Notes Card -->
+  <div onclick="location.href='https://edumocker-daily-vocabs.blogspot.com/'"
+       style="
+        width:50%;
+        background:#ffffff;
+        border-radius:16px;
+        padding:16px 8px;
+        text-align:center;
+        box-shadow:0 6px 18px rgba(0,0,0,0.12);
+        cursor:pointer;
+       ">
+
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjFo3V-wxX-9g670O7uMipvSvzhAVD0d8cDpPg5F12Jv6vZ4_rkaSniONAT3fDx_TrlmG6alSr1PFgA-lByUYum9jHDg1b6y_hhIueSxnfBdnYGm9fSEi0O7x3wQn6KUr6MoiNBFvMrxJTpFJM_R5dxydORfB_0xatlk4h7U-TayGr1pagVqauY1-sav1Dr/s1600/icons8-dictionary-65.png"
+         style="width:48px; height:48px; margin-bottom:10px;">
+
+    <div style="font-size:15px; font-weight:600; color:#222;">
+      Daily Vocabs
+    </div>
+
+  </div>
+
+  <!-- Calculation Speed Card -->
+  <div onclick="location.href='https://forsscprepare-ui.github.io/ask-doubt/'"
+       style="
+        width:50%;
+        background:#ffffff;
+        border-radius:16px;
+        padding:16px 8px;
+        text-align:center;
+        box-shadow:0 6px 18px rgba(0,0,0,0.12);
+        cursor:pointer;
+       ">
+
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgujJbo7a9kXDgOat23b6KPTqWxoWRLsZaMyzGyBguMKUZaS-s7BDYP0yi2tPS4iOWtsgRneZEXieTZ3OhF9MkWaSaf4QyPGmfYB9e9zIEUYwXZGqVgbRfUftV31I8bPSJ7ib3smSUZI6Ct-arA0NT3QR5FmlmNwzw37ZPfbFxU9fO_Aic2yU4k4zENT7RM/s1600/icons8-authentic-64.png"
+         style="width:48px; height:48px; margin-bottom:10px;">
+
+    <div style="font-size:15px; font-weight:600; color:#222;">
+      Ask Doubts
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+    
+</div>
+
+<div id="mock" class="tab-content active">
+
+
+<div style="display:none;">
+ <center> <a href="https://forsscprepare-ui.github.io/Free-mocktest-page/" 
+   style="font-weight:bold; color:#2196F3; font-size:15px; text-decoration:none; margin-bottom:10px;">
+ 👉 Try Free MockTest Here 👈
+</a></center>
+
+</div>
+
+
+  
+  <div class="cards">
+
+
+
+
+
+      
+    <div class="card" data-link="https://forsscprepare-ui.github.io/ossc-cgl-sectional-mocktest/" data-locked="no">
+  <div style="font-size:20px;font-weight:bold;">OSSC CGL</div>
+
+        <div style="font-size:14px;color:#666;margin-top:8px;">
+    Full Prelims Mocktests - 20 Sets
+  </div>
+         <div style="font-size:14px;color:#666;margin-top:4px;">
+    Full Mains Mocktests - 20 Sets
+  </div>
+        <div style="font-size:14px;color:#666;margin-top:4px;">
+    Prelims Sectional Mocktests - 90 Sets(each subject - 15sets)
+  </div>
+        <div style="font-size:14px;color:#666;margin-top:4px;">
+    Mains Sectional Mocktests - 40 Sets(each subject - 20sets)
+  </div>
+
+      <div style="font-size:14px;color:#666;margin-top:8px;">
+    Previous Year Questions Mocktests - 5 Sets
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+<div style="display: none;">
+
+
+<div class="card" data-link="https://earniqofficial-creator.github.io/OSSSC-FOREST-GAURD/" data-locked="no">
+  <div style="font-size:20px;font-weight:bold;">OSSSC	Forester, Forest Guard and Excise Constable</div>
+
+         <div style="font-size:14px;color:#666;margin-top:8px;">
+    Full Prelims Mocktests - 30 Sets
+  </div>
+
+        <div style="font-size:14px;color:#666;margin-top:4px;">
+    Prelims Sectional Mocktests - 75 Sets(each subject - 15sets)
+  </div>
+
+
+  <div style="font-size:14px;color:#666;margin-top:8px;">
+    Previous Year Questions Mocktests - 5 Sets
+  </div>
+
+
+
+  
+</div>
+
+
+    
+
+
+
+
+
+
+
+
+      
+   <div class="card" data-link="https://odinathofficial-art.github.io/OSSSC-RI-ARI/" data-locked="no">
+  <div style="font-size:20px;font-weight:bold;">OSSSC RI ARI AMIN</div>
+
+        <div style="font-size:14px;color:#666;margin-top:8px;">
+    Full Prelims Mocktests - 30 Sets
+  </div>
+
+        <div style="font-size:14px;color:#666;margin-top:4px;">
+    Prelims Sectional Mocktests - 90 Sets(each subject - 15 sets)
+  </div>
+
+
+
+<div style="font-size:14px;color:#666;margin-top:8px;">
+    Previous Year Questions Mocktests - 5 Sets
+  </div>
+
+
+
+
+
+     
+</div>
+
+
+</div>
+
+
+      
+  </div>
+</div>
+
+<div id="topic" class="tab-content">
+
+
+
+
+<div style="display:none;">
+  <center> <a href="https://forsscprepare-ui.github.io/free-topicwise-list/" 
+   style="font-weight:bold; color:#2196F3; font-size:15px; text-decoration:none; margin-bottom:10px;">
+  👉 Try Free Topic-Wise Practice Here 👈
+</a></center></div>
+
+  <div class="cards">
+      <div class="card" data-link="https://sscgk.store/" data-locked="no">General Awareness(All)</div>
+    <div class="card" data-link="https://sscgk.store/" data-locked="no">Odia</div>
+    <div class="card" data-link="https://sscgk.store/" data-locked="no">Reasoning</div>
+    <div class="card" data-link="https://sscgk.store/" data-locked="no">Math(DI)</div>
+      <div class="card" data-link="https://sscgk.store/" data-locked="no">Math(All)</div>
+    <div class="card" data-link="https://officialappaarav-spec.github.io/current-affairsMonths/" data-locked="no">Current Affairs</div>
+      <div class="card" data-link="https://sscgk.store/" data-locked="no">Computer Awareness</div>
+      <div class="card" data-link="https://officialappaarav-spec.github.io/Odisha-GK/" data-locked="no">Odisha GK</div>
+      
+  </div>
+</div>
+
+<div class="popup-overlay" id="popup">
+  <div class="popup">
+    <p>This content is PAID💸.</p>
+     <strong> <h3>Buy - ₹59</h3></strong>
+      <p>For 3 Months</p>
+    <button onclick="window.location.href='https://rzp.io/rzp/C3DYS4ea'">Buy Now</button>
+  </div>
+</div>
+
+<div class="loader" id="loader">
+  <div class="spin"></div>
+  <div>Wait a second…</div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAm8LD9iSm24vG2rc_bBSjXuATXxs7-lbE",
+  authDomain: "odia-abhyas.firebaseapp.com",
+  projectId: "odia-abhyas",
+  storageBucket: "odia-abhyas.firebasestorage.app",
+  messagingSenderId: "44504332636",
+  appId: "1:44504332636:web:ed8cfaaed7bee347926999",
+  measurementId: "G-LYNPZSF967"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const loader = document.getElementById("loader");
+const popup = document.getElementById("popup");
+
+const phone = localStorage.getItem("user_phone");
+if(!phone){ alert("No login found"); }
+
+const snap = await getDoc(doc(db,"users",phone));
+const data = snap.data();
+
+document.getElementById("username").innerText = data.name || "User";
+
+const now = new Date();
+const expiry = data.duration ? new Date(data.duration+"T23:59:59") : null;
+
+document.querySelectorAll(".card").forEach(card=>{
+  if(card.dataset.locked==="yes"){
+    if(data.paid==="yes" && expiry && now<=expiry){
+      card.classList.remove("locked");
+    }else{
+      card.classList.add("locked");
+    }
+  }
+
+  card.onclick=()=>{
+    if(card.classList.contains("locked")){
+      popup.style.display="flex";
+    }else{
+      window.open(card.dataset.link,"_blank");
+    }
+  }
+});
+
+loader.style.display="none";
+</script>
+
+<script>
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  }
+});
+
+
+
+
+const popupOverlay = document.getElementById("popup");
+
+// Close popup when clicking outside the popup box
+popupOverlay.addEventListener("click", function(e){
+  if(e.target === popupOverlay){
+    popupOverlay.style.display = "none";
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('paste', e => e.preventDefault());
+
+  
+</script>
+
+</body>
+</html>
