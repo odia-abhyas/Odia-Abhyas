@@ -466,33 +466,39 @@ document.querySelectorAll(".card").forEach(card=>{
     }
   }
 
-  card.onclick = () => {
+
+
+card.onclick = () => {
   if (card.classList.contains("locked")) {
     popup.style.display = "flex";
   } else {
-    // 1. Define the Fullscreen Request
+    // 1. Create or select an iframe to hold the content
+    let fsFrame = document.getElementById('fsFrame');
+    if (!fsFrame) {
+      fsFrame = document.createElement('iframe');
+      fsFrame.id = 'fsFrame';
+      fsFrame.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; display:none; background:#fff; z-index:999999;";
+      document.body.appendChild(fsFrame);
+    }
+
+    // 2. Set the source to your card link
+    fsFrame.src = card.dataset.link;
+    fsFrame.style.display = "block";
+
+    // 3. Trigger Fullscreen on the document
     const elem = document.documentElement;
     const requestFS = elem.requestFullscreen || 
                       elem.webkitRequestFullscreen || 
-                      elem.mozRequestFullScreen || 
                       elem.msRequestFullscreen;
 
-    // 2. Trigger Fullscreen
     if (requestFS) {
-      requestFS.call(elem).then(() => {
-        // 3. Navigate only AFTER the fullscreen request is initiated
-        window.location.href = card.dataset.link;
-      }).catch(err => {
-        // Fallback: If fullscreen fails, still navigate
-        console.warn("Fullscreen denied:", err);
-        window.location.href = card.dataset.link;
+      requestFS.call(elem).catch(err => {
+        console.warn("Fullscreen blocked:", err);
       });
-    } else {
-      // Fallback for browsers that don't support Fullscreen API
-      window.location.href = card.dataset.link;
     }
   }
 };
+
 });
 
 loader.style.display="none";
