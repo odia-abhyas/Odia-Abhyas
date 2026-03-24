@@ -307,14 +307,10 @@ header span{font-weight:bold}
 
 
       
-    <a href="https://odia-abhyas.github.io/OSSC-CGL/" style="text-decoration: none; color: inherit;">
-  <div class="card" data-locked="no">
-    <div style="font-size:20px;font-weight:bold;">OSSC CGL</div>
-    <div style="font-size:14px;color:#666;margin-top:8px;">
-      Odia Sectional Mocktests - 0 Sets
-    </div>
-  </div>
-</a>
+<div class="card" data-link="https://odia-abhyas.github.io/OSSC-CGL/" data-locked="no">
+  <div style="font-size:20px;font-weight:bold;">OSSC CGL</div>
+  
+</div>
 
 
 
@@ -474,7 +470,7 @@ document.querySelectorAll(".card").forEach(card=>{
     if(card.classList.contains("locked")){
       popup.style.display="flex";
     }else{
-      window.open(card.dataset.link,"_blank");
+      window.location.href = card.dataset.link;
     }
   }
 });
