@@ -468,36 +468,19 @@ document.querySelectorAll(".card").forEach(card=>{
 
 
 
-card.onclick = () => {
-  if (card.classList.contains("locked")) {
-    popup.style.display = "flex";
-  } else {
-    // 1. Create or select an iframe to hold the content
-    let fsFrame = document.getElementById('fsFrame');
-    if (!fsFrame) {
-      fsFrame = document.createElement('iframe');
-      fsFrame.id = 'fsFrame';
-      fsFrame.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; display:none; background:#fff; z-index:999999;";
-      document.body.appendChild(fsFrame);
+card.onclick=()=>{
+
+    if(card.classList.contains("locked")){
+
+      popup.style.display="flex";
+
+    }else{
+
+      window.location.href = card.dataset.link;
+
     }
 
-    // 2. Set the source to your card link
-    fsFrame.src = card.dataset.link;
-    fsFrame.style.display = "block";
-
-    // 3. Trigger Fullscreen on the document
-    const elem = document.documentElement;
-    const requestFS = elem.requestFullscreen || 
-                      elem.webkitRequestFullscreen || 
-                      elem.msRequestFullscreen;
-
-    if (requestFS) {
-      requestFS.call(elem).catch(err => {
-        console.warn("Fullscreen blocked:", err);
-      });
-    }
   }
-};
 
 });
 
