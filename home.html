@@ -466,13 +466,33 @@ document.querySelectorAll(".card").forEach(card=>{
     }
   }
 
-  card.onclick=()=>{
-    if(card.classList.contains("locked")){
-      popup.style.display="flex";
-    }else{
+  card.onclick = () => {
+  if (card.classList.contains("locked")) {
+    popup.style.display = "flex";
+  } else {
+    // 1. Define the Fullscreen Request
+    const elem = document.documentElement;
+    const requestFS = elem.requestFullscreen || 
+                      elem.webkitRequestFullscreen || 
+                      elem.mozRequestFullScreen || 
+                      elem.msRequestFullscreen;
+
+    // 2. Trigger Fullscreen
+    if (requestFS) {
+      requestFS.call(elem).then(() => {
+        // 3. Navigate only AFTER the fullscreen request is initiated
+        window.location.href = card.dataset.link;
+      }).catch(err => {
+        // Fallback: If fullscreen fails, still navigate
+        console.warn("Fullscreen denied:", err);
+        window.location.href = card.dataset.link;
+      });
+    } else {
+      // Fallback for browsers that don't support Fullscreen API
       window.location.href = card.dataset.link;
     }
   }
+};
 });
 
 loader.style.display="none";
