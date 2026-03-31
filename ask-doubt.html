@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" 
+content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Ask Doubt - Odia Abhyas</title>
+
+<style>
+html,body{
+margin:0;
+padding:0;
+height:100%;
+width:100%;
+overflow:hidden;
+font-family:Arial;
+background:#ece5dd;
+}
+
+body{
+display:flex;
+flex-direction:column;
+}
+
+.header{
+background:#075e54;
+color:white;
+padding:15px;
+text-align:center;
+font-weight:bold;
+}
+
+#chatBox{
+flex:1;
+overflow-y:auto;
+padding:10px;
+display:flex;
+flex-direction:column;
+height:0;
+}
+
+.message{
+max-width:75%;
+padding:10px;
+margin:5px 0;
+border-radius:10px;
+word-wrap:break-word;
+font-size:14px;
+}
+
+.user{
+align-self:flex-end;
+background:#dcf8c6;
+}
+
+.admin{
+align-self:flex-start;
+background:white;
+}
+
+/* ===== INPUT AREA ===== */
+
+.inputArea{
+display:flex;
+padding:8px;
+background:#f0f0f0;
+align-items:center;
+gap:8px;
+}
+
+input[type="text"]{
+flex:1;
+min-width:0;
+padding:14px 18px;
+border-radius:25px;
+border:1px solid #ddd;
+outline:none;
+font-size:16px;
+background:white;
+}
+
+/* Hide default file input */
+#imageInput{
+display:none;
+}
+
+/* Upload icon button */
+.uploadBtn{
+width:45px;
+height:45px;
+border-radius:50%;
+background:#075e54;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+cursor:pointer;
+flex-shrink:0;
+}
+
+button{
+background:#075e54;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:25px;
+cursor:pointer;
+font-size:15px;
+}
+
+button:disabled{
+background:#999;
+cursor:not-allowed;
+}
+
+.loaderBox{
+position:fixed;
+inset:0;
+display:flex;
+justify-content:center;
+align-items:center;
+background:white;
+}
+
+.loader{
+width:60px;
+height:60px;
+border:6px solid #ddd;
+border-top:6px solid #075e54;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+img.chatImg{
+max-width:100%;
+border-radius:8px;
+margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="loaderBox" id="loaderBox">
+<div class="loader"></div>
+</div>
+
+<div class="header">Odia Abhyas Doubt Support</div>
+
+<div id="chatBox"></div>
+
+<div class="inputArea">
+
+<label for="imageInput" class="uploadBtn">🗂️</label>
+<input type="file" id="imageInput" accept="image/*" multiple>
+
+<input type="text" id="messageInput" placeholder="Type your doubt... (ଏଠାରେ ପ୍ରଶ୍ନ ଲେଖନ୍ତୁ)">
+
+<button id="sendBtn" disabled>Send</button>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDPtyBu50HCFyHY9jotpWD_grC-8zdQn5k",
+  authDomain: "odia-abhyas-doubt.firebaseapp.com",
+  projectId: "odia-abhyas-doubt",
+  storageBucket: "odia-abhyas-doubt.firebasestorage.app",
+  messagingSenderId: "190367595117",
+  appId: "1:190367595117:web:e88a2f951ac4801914dd64"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const phone = localStorage.getItem("user_phone");
+const name = localStorage.getItem("user_name");
+const email = localStorage.getItem("user_email");
+
+if(!phone || !name){
+alert("Login required");
+window.location.href="login.html";
+}
+
+const userId = phone;
+
+await setDoc(doc(db,"chats",userId),{
+phone: phone,
+name: name,
+email: email,
+lastActive: Date.now()
+},{ merge:true });
+
+const chatBox = document.getElementById("chatBox");
+const messageInput = document.getElementById("messageInput");
+const imageInput = document.getElementById("imageInput");
+const sendBtn = document.getElementById("sendBtn");
+
+let savedMessages = JSON.parse(localStorage.getItem("chat_cache_"+userId)) || [];
+let messageIds = new Set(savedMessages.map(m => m.id));
+
+savedMessages.forEach(m => displayMessage(m));
+
+function displayMessage(data){
+const div = document.createElement("div");
+div.className = "message " + (data.sender === "user" ? "user" : "admin");
+div.innerHTML = data.text || "";
+
+if(data.image){
+const img = document.createElement("img");
+img.src = data.image;
+img.className = "chatImg";
+div.appendChild(img);
+}
+
+chatBox.appendChild(div);
+chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function checkInput(){
+if(messageInput.value.trim() !== "" || imageInput.files.length > 0){
+sendBtn.disabled = false;
+}else{
+sendBtn.disabled = true;
+}
+}
+
+messageInput.addEventListener("input", checkInput);
+imageInput.addEventListener("change", checkInput);
+sendBtn.addEventListener("click", sendMessage);
+
+async function sendMessage(){
+
+const text = messageInput.value.trim();
+const files = imageInput.files;
+
+if(!text && files.length===0) return;
+
+if(files.length>2){
+alert("Max 2 images allowed");
+return;
+}
+
+for(let file of files){
+if(file.size > 2*1024*1024){
+alert("Image must be under 2MB");
+return;
+}
+}
+
+sendBtn.disabled = true;
+
+if(text){
+await addDoc(collection(db,"chats",userId,"messages"),{
+sender:"user",
+text:text,
+timestamp:Date.now()
+});
+}
+
+for(let file of files){
+const base64 = await convertToBase64(file);
+await addDoc(collection(db,"chats",userId,"messages"),{
+sender:"user",
+image:base64,
+timestamp:Date.now()
+});
+}
+
+messageInput.value="";
+imageInput.value="";
+checkInput();
+}
+
+function convertToBase64(file){
+return new Promise((resolve,reject)=>{
+const reader = new FileReader();
+reader.onload = ()=> resolve(reader.result);
+reader.onerror = reject;
+reader.readAsDataURL(file);
+});
+}
+
+const q = query(collection(db,"chats",userId,"messages"), orderBy("timestamp"));
+
+onSnapshot(q, snapshot=>{
+snapshot.docChanges().forEach(change=>{
+if(change.type==="added"){
+const docId = change.doc.id;
+const data = change.doc.data();
+if(messageIds.has(docId)) return;
+messageIds.add(docId);
+const messageData = { id: docId, ...data };
+displayMessage(messageData);
+savedMessages.push(messageData);
+localStorage.setItem("chat_cache_"+userId,JSON.stringify(savedMessages));
+}
+});
+document.getElementById("loaderBox").style.display="none";
+});
+
+</script>
+
+</body>
+</html>
